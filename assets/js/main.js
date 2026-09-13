@@ -6,27 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initRoleSwitch();
   initRevealOnScroll();
   initTransparentHeader();
-  initHeaderHeightVar();
 });
 
-// Keeps --header-h in sync with the real header height so the full-bleed
-// hero photo lines up exactly behind the transparent header, with no gap
-// (the header's rendered height shifts with content/webfont changes, so a
-// hardcoded value drifts and leaves a sliver of the page background showing).
-function initHeaderHeightVar() {
-  const header = document.querySelector('.site-header');
-  if (!header) return;
-
-  const setHeaderHeightVar = () => {
-    document.documentElement.style.setProperty('--header-h', `${header.offsetHeight}px`);
-  };
-
-  setHeaderHeightVar();
-  window.addEventListener('resize', setHeaderHeightVar);
-  document.fonts?.ready.then(setHeaderHeightVar);
-}
-
 function initMobileNav() {
+  const header = document.querySelector('.site-header');
   const toggle = document.querySelector('.nav-toggle');
   const menu = document.querySelector('.mobile-menu');
   if (!toggle || !menu) return;
@@ -34,12 +17,16 @@ function initMobileNav() {
   toggle.addEventListener('click', () => {
     const isOpen = menu.classList.toggle('is-open');
     toggle.setAttribute('aria-expanded', String(isOpen));
+    // Relax the header's full pill radius while the dropdown is open, so the
+    // now-tall island reads as a rounded panel instead of a stretched capsule.
+    header?.classList.toggle('nav-open', isOpen);
   });
 
   menu.querySelectorAll('a').forEach((link) => {
     link.addEventListener('click', () => {
       menu.classList.remove('is-open');
       toggle.setAttribute('aria-expanded', 'false');
+      header?.classList.remove('nav-open');
     });
   });
 }

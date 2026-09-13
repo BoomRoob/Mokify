@@ -74,9 +74,7 @@
   --dur-fast: 150ms;
   --dur-base: 260ms;
   --dur-slow: 420ms;
-
-  /* Layout */
-  --header-h: 72px;
+  --dur-header: 520ms;
 
   color-scheme: light;
 }
@@ -289,23 +287,41 @@ h3, .h3 {
 .btn[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; box-shadow: none; }
 
 /* ==========================================================================
-   Header / Nav — a row of folder tabs, not a floating pill
+   Header / Nav — a floating rounded "island", pinned to the top of the
+   viewport and detached from the edges (à la Dynamic Island), instead of
+   a full-width bar
    ========================================================================== */
 
 .site-header {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
   z-index: 100;
-  background: var(--paper);
-  border-bottom: 1.5px solid var(--ink-900);
+  width: calc(100% - var(--space-6) * 2);
+  max-width: 860px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid rgba(32, 30, 27, 0.1);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  transform: translateX(-50%);
+  transition: background var(--dur-header) var(--ease-out),
+              border-color var(--dur-header) var(--ease-out),
+              box-shadow var(--dur-header) var(--ease-out),
+              border-radius var(--dur-header) var(--ease-out);
 }
+.site-header.nav-open { border-radius: var(--radius-lg); }
+
+.site-header .container { max-width: none; margin-inline: 0; padding-inline: 0; }
 
 .nav-shell {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding-block: var(--space-3);
+  padding-block: var(--space-2);
+  padding-inline: var(--space-5);
 }
 
 .brand {
@@ -314,34 +330,26 @@ h3, .h3 {
   gap: var(--space-2);
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   color: var(--ink-900);
+  transition: color var(--dur-header) var(--ease-out);
 }
-.brand img { height: 30px; width: 30px; }
+.brand img { height: 28px; width: 28px; transition: filter var(--dur-header) var(--ease-out); }
 
 .nav-links {
   display: none;
-  align-items: stretch;
-  gap: 0;
+  align-items: center;
+  gap: var(--space-1);
   font-weight: 600;
   font-size: 0.92rem;
 }
 .nav-links a {
   padding: var(--space-2) var(--space-4);
-  border: 1.5px solid transparent;
-  border-bottom: none;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  margin-bottom: -1px;
-  transform: translateY(2px);
-  transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+  border-radius: 999px;
+  transition: background var(--dur-header) var(--ease-out), color var(--dur-header) var(--ease-out);
 }
-.nav-links a:hover { transform: translateY(0); background: var(--paper-raised); border-color: var(--ink-300); }
-.nav-links a[aria-current="page"] {
-  transform: translateY(0);
-  background: var(--paper-raised);
-  border-color: var(--ink-900);
-  border-bottom: 1px solid var(--paper-raised);
-}
+.nav-links a:hover { background: rgba(32, 30, 27, 0.08); }
+.nav-links a[aria-current="page"] { background: rgba(32, 30, 27, 0.08); }
 
 .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
 .nav-cta-group { display: none; align-items: center; gap: var(--space-3); }
@@ -350,12 +358,13 @@ h3, .h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
   border: 1.5px solid var(--ink-900);
   background: var(--paper-raised);
   cursor: pointer;
+  transition: border-color var(--dur-header) var(--ease-out), background var(--dur-header) var(--ease-out), color var(--dur-header) var(--ease-out);
 }
 
 @media (min-width: 900px) {
@@ -364,25 +373,26 @@ h3, .h3 {
   .nav-toggle { display: none; }
 }
 
-/* Transparent header floating over a full-bleed hero photo, until scrolled */
-.site-header--transparent {
-  transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
-}
+/* Dark-glass variant floating over a full-bleed hero photo, until scrolled */
 .site-header--transparent:not(.is-scrolled) {
-  background: transparent;
-  border-bottom-color: transparent;
+  background: rgba(20, 22, 28, 0.5);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 .site-header--transparent:not(.is-scrolled) .brand,
 .site-header--transparent:not(.is-scrolled) .nav-links a,
 .site-header--transparent:not(.is-scrolled) .nav-toggle {
   color: var(--white);
 }
-.site-header--transparent:not(.is-scrolled) .nav-links a:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.4);
+.site-header--transparent:not(.is-scrolled) .brand img {
+  /* Flattens the mark's navy/white to solid white so it reads against the photo */
+  filter: brightness(0) invert(1);
+}
+.site-header--transparent:not(.is-scrolled) .nav-links a:hover,
+.site-header--transparent:not(.is-scrolled) .nav-links a[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.16);
 }
 .site-header--transparent:not(.is-scrolled) .nav-toggle {
-  border-color: var(--white);
+  border-color: rgba(255, 255, 255, 0.5);
   background: rgba(255, 255, 255, 0.1);
 }
 .site-header--transparent:not(.is-scrolled) .btn-ghost {
@@ -437,26 +447,23 @@ h3, .h3 {
 
 .hero-copy .lede { margin-top: var(--space-5); }
 
-/* Full-bleed photo hero, image runs behind the transparent header.
-   Sized to exactly fill the viewport below the header, so the hero is
-   the only thing visible on load — the next section only appears on scroll. */
+/* Full-bleed photo hero. The header now floats above it (position: fixed),
+   so it no longer reserves layout space — the hero simply fills the whole
+   viewport, and the fixed top padding just clears the floating nav island. */
 .hero--photo {
   position: relative;
   isolation: isolate;
-  min-height: calc(100dvh - var(--header-h));
+  min-height: 100dvh;
   display: flex;
   align-items: flex-start;
-  padding-top: clamp(32px, 10vh, 120px);
+  padding-top: clamp(110px, 20vh, 200px);
   padding-bottom: var(--space-8);
 }
 .hero--photo::before,
 .hero--photo::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(-1 * var(--header-h));
-  bottom: 0;
+  inset: 0;
   z-index: -1;
 }
 .hero--photo::before {
@@ -465,7 +472,7 @@ h3, .h3 {
 .hero--photo::after {
   background: rgba(16, 18, 26, 0.5);
 }
-.hero--photo .hero-copy { max-width: 640px; margin-inline: auto; text-align: center; }
+.hero--photo .hero-copy { max-width: 720px; margin-inline: auto; text-align: center; }
 .hero--photo h1 { color: var(--white); }
 .hero--photo .lede { color: rgba(255, 255, 255, 0.88); margin-inline: auto; }
 
@@ -740,7 +747,7 @@ h3, .h3 {
    404 page — full-height, no-scroll shell, video stacked over text
    ========================================================================== */
 
-.notfound-shell { min-height: 100dvh; display: flex; flex-direction: column; }
+.notfound-shell { min-height: 100dvh; display: flex; flex-direction: column; padding-top: clamp(90px, 16vh, 160px); }
 .notfound-main { flex: 1; display: flex; align-items: center; padding-block: var(--space-3); min-height: 0; }
 .notfound-stack { width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-2); }
 
