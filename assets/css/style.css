@@ -117,12 +117,9 @@ h1, h2, h3, h4, p { margin: 0; }
 
 ::selection { background: var(--highlighter); color: var(--ink-900); }
 
-/* Slim scrollbar instead of the browser's default thick track/thumb */
-html { scrollbar-width: thin; scrollbar-color: var(--ink-300) transparent; }
-::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--ink-300); border-radius: var(--radius-sm); border: 2px solid var(--paper); }
-::-webkit-scrollbar-thumb:hover { background: var(--ink-500); }
+/* Hide the browser's scrollbar entirely — page stays scrollable, just no visible track/thumb */
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 :focus-visible {
   outline: 3px solid var(--pen-blue);
@@ -448,9 +445,9 @@ h3, .h3 {
   isolation: isolate;
   min-height: calc(100dvh - var(--header-h));
   display: flex;
-  align-items: center;
-  padding-top: var(--space-6);
-  padding-bottom: var(--space-10);
+  align-items: flex-start;
+  padding-top: clamp(32px, 10vh, 120px);
+  padding-bottom: var(--space-8);
 }
 .hero--photo::before,
 .hero--photo::after {
