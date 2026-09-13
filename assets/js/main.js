@@ -70,6 +70,9 @@ function initTransparentHeader() {
   window.addEventListener('scroll', onScroll, { passive: true });
 }
 
+// Reveals fade in on the way into view and back out on the way past it,
+// re-arming every time — so scrolling over the same section again always
+// replays the animation, instead of only firing once ever.
 function initRevealOnScroll() {
   const targets = document.querySelectorAll('[data-reveal], [data-reveal-draw]');
   if (!targets.length) return;
@@ -83,10 +86,7 @@ function initRevealOnScroll() {
   const io = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          io.unobserve(entry.target);
-        }
+        entry.target.classList.toggle('is-visible', entry.isIntersecting);
       });
     },
     { threshold: 0.15 }
