@@ -7,7 +7,7 @@
    from another company's visual identity.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap');
 
 :root {
   /* Paper */
@@ -46,6 +46,7 @@
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   --font-hand: 'Kalam', cursive;
+  --font-hero: 'Bricolage Grotesque', var(--font-display);
 
   /* Space (4/8pt rhythm) */
   --space-1: 4px;
@@ -186,27 +187,6 @@ html::-webkit-scrollbar { width: 0; height: 0; display: none; }
 /* ==========================================================================
    Typography
    ========================================================================== */
-
-.marginnote {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  font-family: var(--font-hand);
-  font-size: 1.3rem;
-  color: var(--pen-red);
-  margin-bottom: var(--space-3);
-}
-.marginnote .tag {
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-500);
-  border: 1.5px solid var(--ink-300);
-  border-radius: var(--radius-sm);
-  padding: 0.15em 0.5em;
-}
 
 h1, .h1 {
   font-family: var(--font-display);
@@ -473,7 +453,12 @@ h3, .h3 {
   background: rgba(16, 18, 26, 0.5);
 }
 .hero--photo .hero-copy { max-width: 720px; margin-inline: auto; text-align: center; }
-.hero--photo h1 { color: var(--white); }
+.hero--photo h1 {
+  color: var(--white);
+  font-family: var(--font-hero);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
 .hero--photo .lede { color: rgba(255, 255, 255, 0.88); margin-inline: auto; }
 
 .hero-actions {
@@ -514,43 +499,6 @@ h3, .h3 {
 }
 
 /* ==========================================================================
-   Photo corner — a real photo pinned like a taped snapshot, not a hero image
-   ========================================================================== */
-
-.photo-corner {
-  position: relative;
-  width: 100%;
-  max-width: 280px;
-  margin-inline: auto;
-  background: var(--white);
-  padding: var(--space-2) var(--space-2) var(--space-6);
-  box-shadow: var(--stamp-md);
-  border: 1.5px solid var(--ink-900);
-}
-.photo-corner img { width: 100%; aspect-ratio: 4/5; object-fit: cover; }
-.photo-corner figcaption {
-  position: absolute;
-  bottom: var(--space-2);
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-family: var(--font-hand);
-  font-size: 1.05rem;
-  color: var(--ink-700);
-}
-.photo-corner .tape {
-  position: absolute;
-  top: -14px;
-  left: 50%;
-  width: 64px;
-  height: 24px;
-  margin-left: -32px;
-  background: rgba(252, 228, 119, 0.55);
-  border: 1px solid rgba(32, 30, 27, 0.15);
-  transform: rotate(-3deg);
-}
-
-/* ==========================================================================
    Worksheet list — "Kodėl Mokify" as corrected exercise lines
    ========================================================================== */
 
@@ -573,7 +521,6 @@ h3, .h3 {
   height: 32px;
 }
 .worksheet-row h3 { margin-bottom: var(--space-1); }
-.worksheet-row .marginnote { margin-bottom: 0; margin-top: var(--space-2); font-size: 1.1rem; }
 
 /* ==========================================================================
    Flashcards — "Kodėl bendraamžių mokymas geriau" as a fanned study-card deck
@@ -847,7 +794,6 @@ h3, .h3 {
 }
 
 .notfound-copy { max-width: 46ch; }
-.notfound-copy .marginnote { justify-content: center; margin-bottom: 0; }
 .notfound-copy .lede { margin-inline: auto; }
 .notfound-copy .hero-actions { justify-content: center; }
 
