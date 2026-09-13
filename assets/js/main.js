@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileNav();
   initPasswordToggles();
   initRoleSwitch();
-  initRevealOnScroll();
+  initSectionReveal();
   initTransparentHeader();
 });
 
@@ -70,29 +70,50 @@ function initTransparentHeader() {
   window.addEventListener('scroll', onScroll, { passive: true });
 }
 
-// Reveals fade in on the way into view and back out on the way past it,
-// re-arming every time — so scrolling over the same section again always
-// replays the animation, instead of only firing once ever.
-function initRevealOnScroll() {
-  const targets = document.querySelectorAll('[data-reveal], [data-reveal-draw]');
-  if (!targets.length) return;
+// Only one <section> is ever "loaded" at a time: whichever one currently
+// spans the vertical center of the viewport gets its reveal elements
+// faded in: every other section's reveal elements fade out, even if
+// they're still partly on screen. A section is tracked as "centered" via
+// an IntersectionObserver whose root is collapsed to a 0-height line at
+// the viewport's midpoint (rootMargin -50%/-50%): a section only
+// intersects that line while it's the one straddling the center.
+function initSectionReveal() {
+  const allTargets = document.querySelectorAll('[data-reveal], [data-reveal-draw]');
+  if (!allTargets.length) return;
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReduced || !('IntersectionObserver' in window)) {
-    targets.forEach((el) => el.classList.add('is-visible'));
+    allTargets.forEach((el) => el.classList.add('is-visible'));
     return;
   }
+
+  const sections = Array.from(document.querySelectorAll('main > section'));
+  if (!sections.length) {
+    // No <section> wrappers on this page (e.g. the 404 shell) — nothing to
+    // center-track, so just reveal everything once.
+    allTargets.forEach((el) => el.classList.add('is-visible'));
+    return;
+  }
+
+  const revealTargetsIn = (section) => section.querySelectorAll('[data-reveal], [data-reveal-draw]');
+
+  const setActiveSection = (activeSection) => {
+    sections.forEach((section) => {
+      const isActive = section === activeSection;
+      revealTargetsIn(section).forEach((el) => el.classList.toggle('is-visible', isActive));
+    });
+  };
 
   const io = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        entry.target.classList.toggle('is-visible', entry.isIntersecting);
+        if (entry.isIntersecting) setActiveSection(entry.target);
       });
     },
-    { threshold: 0.15 }
+    { rootMargin: '-50% 0px -50% 0px', threshold: 0 }
   );
 
-  targets.forEach((el) => io.observe(el));
+  sections.forEach((section) => io.observe(section));
 }
 
 // Front-end-only form handling for the auth shell (no backend yet).
