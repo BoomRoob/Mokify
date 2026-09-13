@@ -5,53 +5,25 @@ document.addEventListener('DOMContentLoaded', () => {
   initPasswordToggles();
   initRoleSwitch();
   initRevealOnScroll();
-  initHeaderShadow();
-  initScrolly();
+  initTransparentHeader();
+  initHeaderHeightVar();
 });
 
-function initScrolly() {
-  const root = document.getElementById('scrolly');
-  if (!root || !('IntersectionObserver' in window)) return;
-
-  const steps = Array.from(root.querySelectorAll('.scrolly-step'));
-  const scenes = Array.from(root.querySelectorAll('.scrolly-scene'));
-  const dots = Array.from(root.querySelectorAll('.scrolly-progress .dot'));
-  const symbolIds = ['scene-login', 'scene-match', 'scene-learn'];
-  if (!steps.length) return;
-
-  const setActive = (index) => {
-    steps.forEach((el, i) => el.classList.toggle('is-active', i === index));
-    scenes.forEach((el, i) => el.classList.toggle('is-active', i === index));
-    dots.forEach((el, i) => el.classList.toggle('is-active', i === index));
-    // Accent strokes live inside <symbol> defs, which IntersectionObserver
-    // can never see directly (no layout of their own) — draw them in here,
-    // the moment their scene becomes active, instead.
-    const symbol = document.getElementById(symbolIds[index]);
-    symbol?.querySelectorAll('.draw-in-path').forEach((el) => el.classList.add('is-visible'));
-  };
-
-  setActive(0);
-
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActive(Number(entry.target.dataset.step));
-        }
-      });
-    },
-    { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
-  );
-
-  steps.forEach((el) => io.observe(el));
-}
-
-function initHeaderShadow() {
+// Keeps --header-h in sync with the real header height so the full-bleed
+// hero photo lines up exactly behind the transparent header, with no gap
+// (the header's rendered height shifts with content/webfont changes, so a
+// hardcoded value drifts and leaves a sliver of the page background showing).
+function initHeaderHeightVar() {
   const header = document.querySelector('.site-header');
   if (!header) return;
-  const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
+
+  const setHeaderHeightVar = () => {
+    document.documentElement.style.setProperty('--header-h', `${header.offsetHeight}px`);
+  };
+
+  setHeaderHeightVar();
+  window.addEventListener('resize', setHeaderHeightVar);
+  document.fonts?.ready.then(setHeaderHeightVar);
 }
 
 function initMobileNav() {
@@ -97,6 +69,18 @@ function initRoleSwitch() {
       });
     });
   });
+}
+
+function initTransparentHeader() {
+  const header = document.querySelector('.site-header--transparent');
+  if (!header) return;
+
+  const onScroll = () => {
+    header.classList.toggle('is-scrolled', window.scrollY > 40);
+  };
+
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
 }
 
 function initRevealOnScroll() {
