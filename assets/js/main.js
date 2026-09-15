@@ -106,8 +106,14 @@ function initSectionReveal() {
       const rect = section.getBoundingClientRect();
       const visibleHeight = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
       const denom = Math.min(rect.height, viewportHeight) || 1;
-      const progress = Math.min(1, Math.max(0, visibleHeight / denom));
-      section.style.setProperty('--reveal-progress', progress.toFixed(3));
+      const linear = Math.min(1, Math.max(0, visibleHeight / denom));
+      // Cubic ease-in: raw visibility climbs roughly linearly, but a
+      // section barely poking into view (e.g. 50% visible) should still
+      // read as clearly hidden, not already half-revealed — this keeps
+      // early progress small and saves the dramatic reveal for once the
+      // section is substantially on screen.
+      const eased = linear * linear * linear;
+      section.style.setProperty('--reveal-progress', eased.toFixed(3));
     });
   };
 

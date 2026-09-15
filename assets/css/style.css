@@ -408,13 +408,13 @@ h3, .h3 {
    than a directly-set value — is what reaches these elements. */
 .js [data-reveal] {
   opacity: var(--reveal-progress, 0);
-  transform: translateY(calc((1 - var(--reveal-progress, 0)) * 28px));
+  transform: translateY(calc((1 - var(--reveal-progress, 0)) * 56px));
   transition: opacity 120ms linear, transform 120ms linear;
 }
 .js [data-reveal="scale"] {
-  transform: translateY(calc((1 - var(--reveal-progress, 0)) * 18px))
+  transform: translateY(calc((1 - var(--reveal-progress, 0)) * 36px))
               rotate(var(--rot, -1deg))
-              scale(calc(0.9 + var(--reveal-progress, 0) * 0.1));
+              scale(calc(0.82 + var(--reveal-progress, 0) * 0.18));
 }
 
 /* ==========================================================================
