@@ -592,7 +592,7 @@ h3, .h3 {
   border-bottom: 1.5px dashed var(--ink-300);
 }
 @media (min-width: 720px) {
-  .syllabus-row { grid-template-columns: 90px 1fr auto; align-items: baseline; gap: var(--space-5); }
+  .syllabus-row { grid-template-columns: 90px 1fr; align-items: baseline; gap: var(--space-5); }
 }
 .syllabus-num {
   font-family: var(--font-display);
@@ -603,12 +603,6 @@ h3, .h3 {
 }
 .syllabus-row h3 { margin-bottom: var(--space-1); }
 .syllabus-row p { max-width: 56ch; }
-.syllabus-page {
-  font-family: var(--font-hand);
-  font-size: 1.1rem;
-  color: var(--ink-500);
-  white-space: nowrap;
-}
 
 /* ==========================================================================
    Audience split

@@ -1,6 +1,6 @@
 # Mokify
 
-Landing page for **Mokify**, a peer-to-peer learning platform where students help each other study. Schools adopt the platform; it's always free for students.
+Landing page for **Mokify**, a peer learning platform where students help each other study. Schools adopt the platform; it's always free for students.
 
 ## Stack
 
