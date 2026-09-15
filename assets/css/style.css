@@ -76,7 +76,6 @@
   --dur-base: 320ms;
   --dur-slow: 480ms;
   --dur-header: 600ms;
-  --dur-reveal: 900ms;
 
   color-scheme: light;
 }
@@ -404,15 +403,19 @@ h3, .h3 {
    Motion — scroll reveal
    ========================================================================== */
 
+/* --reveal-progress (0-1) is set on the ancestor <section> by JS and
+   inherits down; no default is declared here so that inheritance — rather
+   than a directly-set value — is what reaches these elements. */
 .js [data-reveal] {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity var(--dur-reveal) var(--ease-out), transform var(--dur-reveal) var(--ease-out);
-  transition-delay: var(--reveal-delay, 0ms);
+  opacity: var(--reveal-progress, 0);
+  transform: translateY(calc((1 - var(--reveal-progress, 0)) * 28px));
+  transition: opacity 120ms linear, transform 120ms linear;
 }
-.js [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
-.js [data-reveal="scale"] { transform: translateY(18px) rotate(var(--rot, -1deg)) scale(0.9); }
-.js [data-reveal="scale"].is-visible { transform: translateY(0) rotate(var(--rot, -1deg)) scale(1); }
+.js [data-reveal="scale"] {
+  transform: translateY(calc((1 - var(--reveal-progress, 0)) * 18px))
+              rotate(var(--rot, -1deg))
+              scale(calc(0.9 + var(--reveal-progress, 0) * 0.1));
+}
 
 /* ==========================================================================
    Hero

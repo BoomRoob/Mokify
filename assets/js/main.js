@@ -70,50 +70,56 @@ function initTransparentHeader() {
   window.addEventListener('scroll', onScroll, { passive: true });
 }
 
-// Only one <section> is ever "loaded" at a time: whichever one currently
-// spans the vertical center of the viewport gets its reveal elements
-// faded in: every other section's reveal elements fade out, even if
-// they're still partly on screen. A section is tracked as "centered" via
-// an IntersectionObserver whose root is collapsed to a 0-height line at
-// the viewport's midpoint (rootMargin -50%/-50%): a section only
-// intersects that line while it's the one straddling the center.
+// Each <section>'s reveal elements track a continuous --reveal-progress
+// (0-1) instead of a binary on/off: it's how much of that section is
+// currently visible (0 = just touching the viewport edge, 1 = the whole
+// section — or as much of it as can fit — is on screen). A light scroll
+// that only grazes a section barely nudges it in; scrolling until the
+// whole section is showing brings it fully in. Set on the <section> via
+// a scroll/resize-driven rAF loop, it inherits down into every
+// [data-reveal] descendant, so this is O(sections) per frame, not
+// O(reveal elements).
 function initSectionReveal() {
   const allTargets = document.querySelectorAll('[data-reveal], [data-reveal-draw]');
   if (!allTargets.length) return;
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReduced || !('IntersectionObserver' in window)) {
-    allTargets.forEach((el) => el.classList.add('is-visible'));
+  if (prefersReduced) {
+    allTargets.forEach((el) => el.style.setProperty('--reveal-progress', 1));
     return;
   }
 
   const sections = Array.from(document.querySelectorAll('main > section'));
   if (!sections.length) {
     // No <section> wrappers on this page (e.g. the 404 shell) — nothing to
-    // center-track, so just reveal everything once.
-    allTargets.forEach((el) => el.classList.add('is-visible'));
+    // scrub against, so just reveal everything once.
+    allTargets.forEach((el) => el.style.setProperty('--reveal-progress', 1));
     return;
   }
 
-  const revealTargetsIn = (section) => section.querySelectorAll('[data-reveal], [data-reveal-draw]');
+  let ticking = false;
 
-  const setActiveSection = (activeSection) => {
+  const updateProgress = () => {
+    ticking = false;
+    const viewportHeight = window.innerHeight;
     sections.forEach((section) => {
-      const isActive = section === activeSection;
-      revealTargetsIn(section).forEach((el) => el.classList.toggle('is-visible', isActive));
+      const rect = section.getBoundingClientRect();
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
+      const denom = Math.min(rect.height, viewportHeight) || 1;
+      const progress = Math.min(1, Math.max(0, visibleHeight / denom));
+      section.style.setProperty('--reveal-progress', progress.toFixed(3));
     });
   };
 
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) setActiveSection(entry.target);
-      });
-    },
-    { rootMargin: '-50% 0px -50% 0px', threshold: 0 }
-  );
+  const requestUpdate = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(updateProgress);
+  };
 
-  sections.forEach((section) => io.observe(section));
+  updateProgress();
+  window.addEventListener('scroll', requestUpdate, { passive: true });
+  window.addEventListener('resize', requestUpdate);
 }
 
 // Front-end-only form handling for the auth shell (no backend yet).
